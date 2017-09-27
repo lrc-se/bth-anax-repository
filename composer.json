@@ -1,27 +1,28 @@
 {
-    "name": "anax/repository",
+    "name": "lrc-se/anax-repository",
     "type": "library",
-    "description": "Anax repository module.",
-    "keywords": ["boilerplate", "framework", "mvc", "micro", "education"],
-    "homepage": "https://dbwebb.se/anax",
+    "description": "Repository module for model-based data access, for use with the Anax framework.",
+    "keywords": ["repository", "anax", "framework", "database", "model", "education"],
+    "homepage": "https://github.com/lrc-se/bth-anax-repository",
     "license": "MIT",
     "authors": [
         {
             "name": "LRC",
             "email": "kabc16@student.bth.se",
-            "homepage": "https://dbwebb.se",
+            "homepage": "https://github.com/lrc-se",
             "role": "Developer"
         }
     ],
     "support": {
-        "issues": "https://github.com/canax/repository/issues"
+        "issues": "https://github.com/lrc-se/bth-anax-repository/issues"
     },
     "autoload": {
         "psr-4": { 
-            "Anax\\": "src/"
+            "LRC\\": "src/"
         }
     },
     "require": {
-        "php": ">=5.6"
+        "php": ">=5.6",
+        "anax/database": "^1.1.0"
     }
 }

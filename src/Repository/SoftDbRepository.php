@@ -20,10 +20,11 @@ class SoftDbRepository extends DbRepository implements SoftRepositoryInterface
      * @param string                                $table      Database table name.
      * @param string                                $modelClass Model class name.
      * @param string                                $deleted    Soft deletion attribute.
+     * @param string                                $key        Primary key column.
      */
-    public function __construct($db, $table, $modelClass, $deleted)
+    public function __construct($db, $table, $modelClass, $deleted, $key = 'id')
     {
-        parent::__construct($db, $table, $modelClass);
+        parent::__construct($db, $table, $modelClass, $key);
         $this->deleted = $deleted;
     }
     
@@ -81,8 +82,8 @@ class SoftDbRepository extends DbRepository implements SoftRepositoryInterface
     {
         $this->db->connect()
             ->update($this->table, [$this->deleted])
-            ->where('id = ?')
-            ->execute([date('Y-m-d H:i:s'), $model->id]);
+            ->where($this->key . ' = ?')
+            ->execute([date('Y-m-d H:i:s'), $model->{$this->key}]);
     }
     
     
@@ -95,8 +96,8 @@ class SoftDbRepository extends DbRepository implements SoftRepositoryInterface
     {
         $this->db->connect()
             ->update($this->table, [$this->deleted])
-            ->where('id = ?')
-            ->execute([null, $model->id]);
+            ->where($this->key . ' = ?')
+            ->execute([null, $model->{$this->key}]);
     }
     
     
@@ -110,7 +111,7 @@ class SoftDbRepository extends DbRepository implements SoftRepositoryInterface
      */
     public function countSoft($conditions = null, $values = [])
     {
-        $res = $this->executeQuery('COUNT(id) AS num', $conditions, $values)
+        $res = $this->executeQuery('COUNT(' . $this->key . ') AS num', $conditions, $values)
             ->fetch();
         return (isset($res->num) ? (int)$res->num : 0);
     }

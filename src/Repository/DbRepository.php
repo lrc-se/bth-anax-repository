@@ -22,6 +22,11 @@ class DbRepository implements RepositoryInterface
      */
     protected $modelClass;
     
+    /**
+     * @var string  Primary key column.
+     */
+    protected $key;
+    
     
     /**
      * Constructor.
@@ -29,12 +34,14 @@ class DbRepository implements RepositoryInterface
      * @param \Anax\Database\DatabaseQueryBuilder   $db         Database service.
      * @param string                                $table      Database table name.
      * @param string                                $modelClass Model class name.
+     * @param string                                $key        Primary key column.
      */
-    public function __construct($db, $table, $modelClass)
+    public function __construct($db, $table, $modelClass, $key = 'id')
     {
         $this->db = $db;
         $this->table = $table;
         $this->modelClass = $modelClass;
+        $this->key = $key;
     }
     
     
@@ -91,7 +98,7 @@ class DbRepository implements RepositoryInterface
      */
     public function save($model)
     {
-        if (isset($model->id)) {
+        if (isset($model->{$this->key})) {
             return $this->update($model);
         }
         
@@ -108,9 +115,9 @@ class DbRepository implements RepositoryInterface
     {
         $this->db->connect()
             ->deleteFrom($this->table)
-            ->where('id = ?')
-            ->execute([$model->id]);
-        $model->id = null;
+            ->where($this->key . ' = ?')
+            ->execute([$model->{$this->key}]);
+        $model->{$this->key} = null;
     }
     
     
@@ -124,7 +131,7 @@ class DbRepository implements RepositoryInterface
      */
     public function count($conditions = null, $values = [])
     {
-        $res = $this->executeQuery('COUNT(id) AS num', $conditions, $values)
+        $res = $this->executeQuery('COUNT(' . $this->key . ') AS num', $conditions, $values)
             ->fetch();
         return (isset($res->num) ? (int)$res->num : 0);
     }
@@ -163,12 +170,12 @@ class DbRepository implements RepositoryInterface
     private function create($model)
     {
         $props = get_object_vars($model);
-        unset($props['id']);
+        unset($props[$this->key]);
         $this->db
             ->connect()
             ->insert($this->table, array_keys($props))
             ->execute(array_values($props));
-        $model->id = $this->db->lastInsertId();
+        $model->{$this->key} = $this->db->lastInsertId();
     }
     
     
@@ -180,13 +187,13 @@ class DbRepository implements RepositoryInterface
     private function update($model)
     {
         $props = get_object_vars($model);
-        unset($props['id']);
+        unset($props[$this->key]);
         $values = array_values($props);
-        $values[] = $model->id;
+        $values[] = $model->{$this->key};
         $this->db
             ->connect()
             ->update($this->table, array_keys($props))
-            ->where('id = ?')
+            ->where($this->key ' = ?')
             ->execute($values);
     }
 }

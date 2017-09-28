@@ -193,7 +193,7 @@ class DbRepository implements RepositoryInterface
         $this->db
             ->connect()
             ->update($this->table, array_keys($props))
-            ->where($this->key ' = ?')
+            ->where($this->key . ' = ?')
             ->execute($values);
     }
 }

@@ -53,7 +53,7 @@ class SoftDbRepository extends DbRepository implements SoftRepositoryInterface
      */
     public function getFirstSoft($conditions = null, $values = [])
     {
-        return $this->executeQuery(null, $conditions, $values)
+        return $this->executeQuerySoft(null, $conditions, $values)
             ->fetchClass($this->modelClass);
     }
     
@@ -68,7 +68,7 @@ class SoftDbRepository extends DbRepository implements SoftRepositoryInterface
      */
     public function getAllSoft($conditions = null, $values = [])
     {
-        return $this->executeQuery(null, $conditions, $values)
+        return $this->executeQuerySoft(null, $conditions, $values)
             ->fetchAllClass($this->modelClass);
     }
     
@@ -111,14 +111,14 @@ class SoftDbRepository extends DbRepository implements SoftRepositoryInterface
      */
     public function countSoft($conditions = null, $values = [])
     {
-        $res = $this->executeQuery('COUNT(' . $this->key . ') AS num', $conditions, $values)
+        $res = $this->executeQuerySoft('COUNT(' . $this->key . ') AS num', $conditions, $values)
             ->fetch();
         return (isset($res->num) ? (int)$res->num : 0);
     }
     
     
     /**
-     * Execute query for selection methods.
+     * Execute soft-deletion-aware query for selection methods.
      * 
      * @param string $select                        Selection criteria.
      * @param string $conditions                    Where conditions.
@@ -127,7 +127,7 @@ class SoftDbRepository extends DbRepository implements SoftRepositoryInterface
      * 
      * @return \Anax\Database\DatabaseQueryBuilder  Database service instance with executed internal query.
      */
-    protected function executeQuery($select = null, $conditions = null, $values = [], $order = null)
+    protected function executeQuerySoft($select = null, $conditions = null, $values = [], $order = null)
     {
         $delCond = $this->deleted . ' IS NULL';
         $conditions = (is_null($conditions) ? $delCond : "($conditions) AND $delCond");

@@ -52,7 +52,7 @@ class SoftDbRepository extends DbRepository implements SoftRepositoryInterface
      */
     public function getFirstSoft($conditions = null, $values = [])
     {
-        return $this->executeQuery(null, $conditions, $values, null, true)
+        return $this->executeQuery(null, $conditions, $values)
             ->fetchClass($this->modelClass);
     }
     
@@ -67,7 +67,7 @@ class SoftDbRepository extends DbRepository implements SoftRepositoryInterface
      */
     public function getAllSoft($conditions = null, $values = [])
     {
-        return $this->executeQuery(null, $conditions, $values, null, true)
+        return $this->executeQuery(null, $conditions, $values)
             ->fetchAllClass($this->modelClass);
     }
     
@@ -110,7 +110,7 @@ class SoftDbRepository extends DbRepository implements SoftRepositoryInterface
      */
     public function countSoft($conditions = null, $values = [])
     {
-        $res = $this->executeQuery('COUNT(id) AS num', $conditions, $values, null, true)
+        $res = $this->executeQuery('COUNT(id) AS num', $conditions, $values)
             ->fetch();
         return (isset($res->num) ? (int)$res->num : 0);
     }

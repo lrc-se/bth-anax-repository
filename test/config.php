@@ -24,3 +24,5 @@ require ANAX_INSTALL_PATH . '/vendor/autoload.php';
  */
 require_once 'models/Book.php';
 require_once 'models/Book2.php';
+require_once 'models/Review.php';
+require_once 'models/Review2.php';

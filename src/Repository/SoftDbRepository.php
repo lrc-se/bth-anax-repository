@@ -80,10 +80,8 @@ class SoftDbRepository extends DbRepository implements SoftRepositoryInterface
      */
     public function deleteSoft($model)
     {
-        $this->db->connect()
-            ->update($this->table, [$this->deleted])
-            ->where($this->key . ' = ?')
-            ->execute([date('Y-m-d H:i:s'), $model->{$this->key}]);
+        $model->deleted = date('Y-m-d H:i:s');
+        $this->save($model);
     }
     
     
@@ -94,10 +92,8 @@ class SoftDbRepository extends DbRepository implements SoftRepositoryInterface
      */
     public function restoreSoft($model)
     {
-        $this->db->connect()
-            ->update($this->table, [$this->deleted])
-            ->where($this->key . ' = ?')
-            ->execute([null, $model->{$this->key}]);
+        $model->deleted = null;
+        $this->save($model);
     }
     
     

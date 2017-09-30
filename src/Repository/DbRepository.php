@@ -143,20 +143,16 @@ class DbRepository implements RepositoryInterface
      * @param string $select                        Selection criteria.
      * @param string $conditions                    Where conditions.
      * @param array  $values                        Array of where condition values to bind.
-     * @param string $order                         Order by conditions.
      * 
      * @return \Anax\Database\DatabaseQueryBuilder  Database service instance with executed internal query.
      */
-    protected function executeQuery($select = null, $conditions = null, $values = [], $order = null)
+    protected function executeQuery($select = null, $conditions = null, $values = [])
     {
         $query = $this->db->connect();
         $query = (!is_null($select) ? $query->select($select) : $query->select());
         $query = $query->from($this->table);
         if (!is_null($conditions)) {
             $query = $query->where($conditions);
-        }
-        if (!is_null($order)) {
-            $query = $query->orderby($order);
         }
         return $query->execute($values);
     }

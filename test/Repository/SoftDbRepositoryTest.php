@@ -11,8 +11,9 @@ require_once 'DbTestCase2.php';
  */
 class SoftDbRepositoryTest extends DbTestCase2
 {
-    public function getRepository()
+    private function getRepository()
     {
+        // custom attribute names
         $db = (new \Anax\Database\DatabaseQueryBuilder())->configure('db2.php');
         return new SoftDbRepository($db, 'book', Book2::class, 'deleted', 'bookId');
     }
@@ -30,14 +31,20 @@ class SoftDbRepositoryTest extends DbTestCase2
     public function testCountSoft()
     {
         $books = $this->getRepository();
+        
+        // all
         $this->assertEquals(
             $this->getConnection()->getRowCount('book', 'deleted IS NULL'),
             $books->countSoft()
         );
+        
+        // with condition (no bound value)
         $this->assertEquals(
             $this->getConnection()->getRowCount('book', 'published IS NOT NULL AND deleted IS NULL'),
             $books->countSoft('published IS NOT NULL')
         );
+        
+        // with condition (bound value)
         $this->assertEquals(
             $this->getConnection()->getRowCount('book', "author = 'J.R.R. Tolkien' AND deleted IS NULL"),
             $books->countSoft('author = ?', ['J.R.R. Tolkien'])
@@ -51,13 +58,16 @@ class SoftDbRepositoryTest extends DbTestCase2
     public function testFindSoft()
     {
         $books = $this->getRepository();
+        
+        // non-deleted
         $book = $books->findSoft('bookId', 4);
         $this->assertInstanceOf(Book2::class, $book);
-        $this->assertEquals($book->bookId, 4);
-        $this->assertEquals($book->title, 'The Klingon Dictionary');
-        $this->assertEquals($book->author, 'Marc Okrand');
-        $this->assertEquals($book->published, 1992);
+        $this->assertEquals(4, $book->bookId);
+        $this->assertEquals('The Klingon Dictionary', $book->title);
+        $this->assertEquals('Marc Okrand', $book->author);
+        $this->assertEquals(1992, $book->published);
         
+        // deleted
         $book = $books->findSoft('bookId', 1);
         $this->assertFalse($book);
     }
@@ -69,20 +79,24 @@ class SoftDbRepositoryTest extends DbTestCase2
     public function testGetFirstSoft()
     {
         $books = $this->getRepository();
+        
+        // non-deleted (unqualified)
         $book = $books->getFirstSoft();
         $this->assertInstanceOf(Book2::class, $book);
-        $this->assertEquals($book->bookId, 2);
-        $this->assertEquals($book->title, 'The Two Towers');
-        $this->assertEquals($book->author, 'J.R.R. Tolkien');
-        $this->assertEquals($book->published, 1954);
+        $this->assertEquals(2, $book->bookId);
+        $this->assertEquals('The Two Towers', $book->title);
+        $this->assertEquals('J.R.R. Tolkien', $book->author);
+        $this->assertEquals(1954, $book->published);
         
+        // non-deleted (with condition)
         $book = $books->getFirstSoft('published < ?', [1955]);
         $this->assertInstanceOf(Book2::class, $book);
-        $this->assertEquals($book->bookId, 2);
-        $this->assertEquals($book->title, 'The Two Towers');
-        $this->assertEquals($book->author, 'J.R.R. Tolkien');
-        $this->assertEquals($book->published, 1954);
+        $this->assertEquals(2, $book->bookId);
+        $this->assertEquals('The Two Towers', $book->title);
+        $this->assertEquals('J.R.R. Tolkien', $book->author);
+        $this->assertEquals(1954, $book->published);
         
+        // deleted
         $book = $books->getFirstSoft('author = ?', ['Sun Tzu']);
         $this->assertFalse($book);
     }
@@ -91,25 +105,28 @@ class SoftDbRepositoryTest extends DbTestCase2
     /**
      * Test getAllSoft method.
      */
-    public function testGetAll()
+    public function testGetAllSoft()
     {
         $books = $this->getRepository();
+        
+        // unqualified
         $allBooks = $books->getAllSoft();
-        $this->assertEquals(count($allBooks), $this->getConnection()->getRowCount('book', 'deleted IS NULL'));
+        $this->assertEquals($this->getConnection()->getRowCount('book', 'deleted IS NULL'), count($allBooks));
         $table = $this->getConnection()->createQueryTable('book', 'SELECT * FROM book WHERE deleted IS NULL');
         $idx = 0;
         foreach ($allBooks as $book) {
             $this->assertInstanceOf(Book2::class, $book);
-            $this->assertEquals(get_object_vars($book), $table->getRow($idx++));
+            $this->assertEquals($table->getRow($idx++), get_object_vars($book));
         }
         
+        // with condition
         $allBooks = $books->getAllSoft("title LIKE 'The %'");
         $table = $this->getConnection()->createQueryTable('book-test', "SELECT * FROM book WHERE title LIKE 'The %' AND deleted IS NULL");
-        $this->assertEquals(count($allBooks), $table->getRowCount());
+        $this->assertEquals($table->getRowCount(), count($allBooks));
         $idx = 0;
         foreach ($allBooks as $book) {
             $this->assertInstanceOf(Book2::class, $book);
-            $this->assertEquals(get_object_vars($book), $table->getRow($idx++));
+            $this->assertEquals($table->getRow($idx++), get_object_vars($book));
         }
     }
     
@@ -121,9 +138,12 @@ class SoftDbRepositoryTest extends DbTestCase2
     {
         $books = $this->getRepository();
         $num = $this->getConnection()->getRowCount('book');
+        $num2 = $this->getConnection()->getRowCount('book', 'deleted IS NULL');
         $book = $books->findSoft('bookId', 3);
         $books->deleteSoft($book);
+        $this->assertNotNull($book->deleted);
         $this->assertEquals($this->getConnection()->getRowCount('book'), $num);
+        $this->assertEquals($this->getConnection()->getRowCount('book', 'deleted IS NULL'), $num2 - 1);
         $oldBook = $books->findSoft('bookId', $book->bookId);
         $this->assertFalse($oldBook);
     }
@@ -136,12 +156,13 @@ class SoftDbRepositoryTest extends DbTestCase2
     {
         $books = $this->getRepository();
         $num = $this->getConnection()->getRowCount('book');
-        $book = $books->findSoft('bookId', 3);
-        $books->deleteSoft($book);
-        $this->assertNotNull($book->deleted);
-        
+        $num2 = $this->getConnection()->getRowCount('book', 'deleted IS NULL');
+        $book = $books->find('bookId', 5);
         $books->restoreSoft($book);
-        $this->assertEquals($this->getConnection()->getRowCount('book'), $num);
         $this->assertNull($book->deleted);
+        $this->assertEquals($this->getConnection()->getRowCount('book'), $num);
+        $this->assertEquals($this->getConnection()->getRowCount('book', 'deleted IS NULL'), $num2 + 1);
+        $newBook = $books->findSoft('bookId', $book->bookId);
+        $this->assertEquals($book, $newBook);
     }
 }

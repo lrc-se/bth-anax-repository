@@ -11,8 +11,9 @@ require_once 'DbTestCase.php';
  */
 class ReferenceResolverTest extends DbTestCase
 {
-    public function getRepositories()
+    private function getRepositories()
     {
+        // default key attribute name
         $db = (new \Anax\Database\DatabaseQueryBuilder())->configure('db.php');
         return [
             new DbRepository($db, 'book', Book::class),
@@ -33,11 +34,14 @@ class ReferenceResolverTest extends DbTestCase
     public function testGetReference()
     {
         list($books, $reviews) = $this->getRepositories();
+        
+        // existing attribute
         $review = $reviews->find('id', 1);
         $book = $review->getReference($books, 'bookId');
         $this->assertInstanceOf(Book::class, $book);
-        $this->assertEquals($book, $books->find('id', $book->id));
+        $this->assertEquals($books->find('id', $book->id), $book);
         
+        // non-existing attribute
         $this->assertNull($review->getReference($books, 'foo'));
     }
 }

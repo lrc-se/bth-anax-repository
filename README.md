@@ -7,7 +7,7 @@ As of now the included implementation works with relational databases only.
 
 This module is intended as a replacement for the existing `ActiveRecordModel` 
 in [*anax/database*](https://github.com/canax/database), 
-offering a better semantic fit for the underlying data source, while also being easier to manage and test, 
+offering a better semantic fit for the underlying data source while also being easier to manage and test, 
 especially from a dependency injection standpoint.
 
 The module also offers automatic soft-deletion capabilities, 

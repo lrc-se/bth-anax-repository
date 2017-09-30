@@ -29,7 +29,7 @@ The module as such requires no configuration, but expects an instance of a prope
 `DatabaseQueryBuilder` from *anax/database* to perform the actual database operations.
 
 
-##### DbRepository
+### DbRepository
 
 Implementation of `RepositoryInterface`. Construction parameters:
 
@@ -40,37 +40,39 @@ Implementation of `RepositoryInterface`. Construction parameters:
 
 __Examples:__
 
-    // setup
-    $db = (new \Anax\Database\DatabaseQueryBuilder())->configure('db.php');
-    $books = new \LRC\Repository\DbRepository($db, 'book', Book::class);
-    
-    // count entries
-    echo $books->count();
-    
-    // retrieve entries
-    $allBooks = $books->getAll();
-    $firstBook = $books->getFirst();
-    $book = $books->find('id', 2);
-    
-    // update entry
-    $book->title .= ' (2nd revision)';
-    $book->published = date('Y');
-    $books->save($book);
-    
-    // delete entry
-    $books->delete($book);
-    $book2 = $books->find('id', 2);
-    var_dump($book->id);    // null
-    var_dump($book2);       // false (standard "no result" return value from PDO)
-    
-    // re-insert entry
-    $books->save($book);
-    var_dump($book->id);    // higher than 2 since the entry was re-inserted, not updated
+```php
+// setup
+$db = (new \Anax\Database\DatabaseQueryBuilder())->configure('db.php');
+$books = new \LRC\Repository\DbRepository($db, 'book', Book::class);
+
+// count entries
+echo $books->count();
+
+// retrieve entries
+$allBooks = $books->getAll();
+$firstBook = $books->getFirst();
+$book = $books->find('id', 2);
+
+// update entry
+$book->title .= ' (2nd revision)';
+$book->published = date('Y');
+$books->save($book);
+
+// delete entry
+$books->delete($book);
+$book2 = $books->find('id', 2);
+var_dump($book->id);    // null
+var_dump($book2);       // false (standard "no result" return value from PDO)
+
+// re-insert entry
+$books->save($book);
+var_dump($book->id);    // higher than 2 since the entry was re-inserted, not updated
+```
 
 Refer to `RepositoryInterface` for a full description of the main API.
 
 
-##### SoftDbRepository
+### SoftDbRepository
 
 Implementation of `SoftRepositoryInterface`, adding soft-deletion awareness. Construction parameters:
 
@@ -82,33 +84,35 @@ Implementation of `SoftRepositoryInterface`, adding soft-deletion awareness. Con
 
 __Examples:__
 
-    // setup
-    $db = (new \Anax\Database\DatabaseQueryBuilder())->configure('db.php');
-    $books = new \LRC\Repository\SoftDbRepository($db, 'book', Book::class);
-    
-    // count non-deleted entries
-    echo $books->countSoft();
-    
-    // retrieve non-deleted entries
-    $allBooks = $books->getAllSoft();
-    $firstBook = $books->getFirstSoft();
-    $book = $books->findSoft('id', 3);
-    
-    // soft-delete entry
-    $books->deleteSoft($book);
-    $book2 = $books->findSoft('id', 3);
-    var_dump($book->id);        // still 3
-    var_dump($book->deleted);   // timestamp
-    var_dump($book2);           // false (standard "no result" return value from PDO)
-    
-    // restore soft-deleted entry
-    $books->restoreSoft($book);
-    var_dump($book->deleted);   // null
+```php
+// setup
+$db = (new \Anax\Database\DatabaseQueryBuilder())->configure('db.php');
+$books = new \LRC\Repository\SoftDbRepository($db, 'book', Book::class);
+
+// count non-deleted entries
+echo $books->countSoft();
+
+// retrieve non-deleted entries
+$allBooks = $books->getAllSoft();
+$firstBook = $books->getFirstSoft();
+$book = $books->findSoft('id', 3);
+
+// soft-delete entry
+$books->deleteSoft($book);
+$book2 = $books->findSoft('id', 3);
+var_dump($book->id);        // still 3
+var_dump($book->deleted);   // timestamp
+var_dump($book2);           // false (standard "no result" return value from PDO)
+
+// restore soft-deleted entry
+$books->restoreSoft($book);
+var_dump($book->deleted);   // null
+```
 
 Refer to `SoftRepositoryInterface` for a full description of the extended API.
 
 
-##### ReferenceResolverTrait
+### ReferenceResolverTrait
 
 Include in model class to get access to automatic foreign key reference resolution. 
 Method invocation:
@@ -123,26 +127,28 @@ This method returns `null` if no matching referenced entry can be found.
 
 __Example:__
 
-    // model class
-    class Review
-    {
-        use \LRC\Repository\ReferenceResolverTrait;
-        
-        /* ... */
-    }
+```php
+// model class
+class Review
+{
+    use \LRC\Repository\ReferenceResolverTrait;
     
-    
-    // setup
-    $db = (new \Anax\Database\DatabaseQueryBuilder())->configure('db.php');
-    $books = new \LRC\Repository\DbRepository($db, 'book', Book::class);
-    $reviews = new \LRC\Repository\DbRepository($db, 'review', Review::class);
-    
-    // retrieve referenced entry
-    $review = $reviews->find('id', 1);
-    $book = $review->getReference($books, 'bookId');
+    /* ... */
+}
 
 
-##### SoftReferenceResolverTrait
+// setup
+$db = (new \Anax\Database\DatabaseQueryBuilder())->configure('db.php');
+$books = new \LRC\Repository\DbRepository($db, 'book', Book::class);
+$reviews = new \LRC\Repository\DbRepository($db, 'review', Review::class);
+
+// retrieve referenced entry
+$review = $reviews->find('id', 1);
+$book = $review->getReference($books, 'bookId');
+```
+
+
+### SoftReferenceResolverTrait
 
 Include in model class to get access to automatic foreign key reference resolution, 
 taking soft-deletion into account. Method invocation:
@@ -157,23 +163,25 @@ This method returns `null` if no matching non-deleted referenced entry can be fo
 
 __Example:__
 
-    // model class
-    class Review
-    {
-        use \LRC\Repository\SoftReferenceResolverTrait;
-        
-        /* ... */
-    }
+```php
+// model class
+class Review
+{
+    use \LRC\Repository\SoftReferenceResolverTrait;
     
-    
-    // setup
-    $db = (new \Anax\Database\DatabaseQueryBuilder())->configure('db.php');
-    $books = new \LRC\Repository\SoftDbRepository($db, 'book', Book::class);
-    $reviews = new \LRC\Repository\DbRepository($db, 'review', Review::class);
-    
-    // retrieve non-deleted referenced entry
-    $review = $reviews->find('id', 1);
-    $book = $review->getReferenceSoft($books, 'bookId');
+    /* ... */
+}
+
+
+// setup
+$db = (new \Anax\Database\DatabaseQueryBuilder())->configure('db.php');
+$books = new \LRC\Repository\SoftDbRepository($db, 'book', Book::class);
+$reviews = new \LRC\Repository\DbRepository($db, 'review', Review::class);
+
+// retrieve non-deleted referenced entry
+$review = $reviews->find('id', 1);
+$book = $review->getReferenceSoft($books, 'bookId');
+```
 
 
 About

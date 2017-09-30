@@ -1,0 +1,42 @@
+book:
+    -
+        bookId: 1
+        title: "The Fellowship of the Ring"
+        author: "J.R.R. Tolkien"
+        published: 1954
+        deleted: 2017-09-29 22:27:13
+    -
+        bookId: 2
+        title: "The Two Towers"
+        author: "J.R.R. Tolkien"
+        published: 1954
+        deleted:
+    -
+        bookId: 3
+        title: "The Return of the King"
+        author: "J.R.R. Tolkien"
+        published: 1955
+        deleted:
+    -
+        bookId: 4
+        title: "The Klingon Dictionary"
+        author: "Marc Okrand"
+        published: 1992
+        deleted:
+    -
+        bookId: 5
+        title: "The Art of War"
+        author: "Sun Tzu"
+        published:
+        deleted: 2017-09-29 22:30:56
+
+review:
+    -
+        revId: 1
+        bookId: 1
+        score: 5
+        text: "One of the greatest books of all time"
+    -
+        revId: 2
+        bookId: 4
+        score: 4

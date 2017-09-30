@@ -1,22 +1,22 @@
 <?php
 
 /**
- * Sample configuration file for test configuration.
+ * Test configuration.
  */
 
 
 /**
  * Define essential Anax paths, end with /
  */
-define("ANAX_INSTALL_PATH", realpath(__DIR__ . "/.."));
-define("ANAX_APP_PATH", ANAX_INSTALL_PATH);
+define('ANAX_INSTALL_PATH', realpath(__DIR__ . '/../../anax'));
+define('ANAX_APP_PATH', __DIR__);
 
 
 
 /**
  * Include autoloader.
  */
-require ANAX_INSTALL_PATH . "/vendor/autoload.php";
+require ANAX_INSTALL_PATH . '/vendor/autoload.php';
 
 
 /**

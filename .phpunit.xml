@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <phpunit
-    bootstrap="test/config.php">
+    bootstrap="test/config.php"
+    extensionsDirectory="test">
 
     <testsuites>
         <testsuite name="all">
@@ -10,7 +11,7 @@
 
     <filter>
         <whitelist processUncoveredFilesFromWhitelist="true">
-            <directory suffix=".php">src</directory>
+            <directory suffix=".php">../anax/vendor/lrc-se/anax-repository/src</directory>
         </whitelist>
     </filter>
 

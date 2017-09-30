@@ -22,7 +22,7 @@ class SoftDbRepository extends DbRepository implements SoftRepositoryInterface
      * @param string                                $deleted    Soft deletion attribute.
      * @param string                                $key        Primary key column.
      */
-    public function __construct($db, $table, $modelClass, $deleted, $key = 'id')
+    public function __construct($db, $table, $modelClass, $deleted = 'deleted', $key = 'id')
     {
         parent::__construct($db, $table, $modelClass, $key);
         $this->deleted = $deleted;

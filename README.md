@@ -184,6 +184,14 @@ $book = $review->getReferenceSoft($books, 'bookId');
 ```
 
 
+Notes
+-----
+
+The module [*anax/common*](https://github.com/canax/common) is **not** a dependency of this module per se, 
+and therefore is not included in *composer.json*, but it **is** required by `DatabaseQueryBuilder` 
+and must be installed and included in the local autoloader together with *anax/database* in order to run the included unit tests.
+
+
 About
 -----
 

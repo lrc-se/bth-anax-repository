@@ -1,6 +1,13 @@
 Revision history
 ================
 
+1.0.2 (2017-10-03)
+-----------------
+
+* Switched to in-memory databases for unit tests
+* Added *anax/common* as development requirement
+
+
 1.0.1 (2017-10-01)
 -----------------
 

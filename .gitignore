@@ -2,5 +2,6 @@
 /build
 /vendor
 /.scaffold
+/test/db/*.sqlite
 memory::
 composer.lock

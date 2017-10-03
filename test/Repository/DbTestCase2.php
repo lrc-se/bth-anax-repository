@@ -18,12 +18,16 @@ abstract class DbTestCase2 extends TestCase
     final public function getConnection()
     {
         if (is_null($this->conn)) {
-            if (is_null(self::$pdo)) {
-                self::$pdo = new \PDO('sqlite:' . ANAX_APP_PATH . '/db/test2.sqlite');
-            }
             $this->conn = $this->createDefaultDBConnection(self::$pdo, 'test2');
         }
 
         return $this->conn;
+    }
+    
+    static public function setUpBeforeClass()
+    {
+        self::$pdo = new \PDO('sqlite:' . ANAX_APP_PATH . '/db/test2.sqlite');
+        self::$pdo->query(file_get_contents(ANAX_APP_PATH . '/db/book2.sql'));
+        self::$pdo->query(file_get_contents(ANAX_APP_PATH . '/db/review2.sql'));
     }
 }

@@ -188,8 +188,11 @@ Notes
 -----
 
 The module [*anax/common*](https://github.com/canax/common) is **not** a dependency of this module per se, 
-and therefore is not included in *composer.json*, but it **is** required by `DatabaseQueryBuilder` 
-and must be installed and included in the local autoloader together with *anax/database* in order to run the included unit tests.
+but it **is** required by `DatabaseQueryBuilder` and is therefore included in the `require-dev` section of *composer.json* 
+in order for the unit tests to work.
+
+Additionally, *anax/database* is not actually required as such, only a corresponding implementation of its `DatabaseQueryBuilder` 
+class providing the same public API, but it has been included as a dependency for simplicity's sake.
 
 
 About

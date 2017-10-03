@@ -24,7 +24,7 @@ abstract class DbTestCase extends TestCase
         return $this->conn;
     }
     
-    static public function setUpBeforeClass()
+    public static function setUpBeforeClass()
     {
         self::$pdo = new \PDO('sqlite:' . ANAX_APP_PATH . '/db/test.sqlite');
         self::$pdo->query(file_get_contents(ANAX_APP_PATH . '/db/book.sql'));

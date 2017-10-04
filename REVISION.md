@@ -1,6 +1,13 @@
 Revision history
 ================
 
+1.0.3 (2017-10-04)
+-----------------
+
+* Integrated Travis CI and Scrutinizer
+* Fixed code quality issue discovered by Scrutinizer
+
+
 1.0.2 (2017-10-03)
 -----------------
 

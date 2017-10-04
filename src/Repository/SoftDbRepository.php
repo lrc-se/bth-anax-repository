@@ -119,14 +119,13 @@ class SoftDbRepository extends DbRepository implements SoftRepositoryInterface
      * @param string $select                        Selection criteria.
      * @param string $conditions                    Where conditions.
      * @param array  $values                        Array of where condition values to bind.
-     * @param string $order                         Order by conditions.
      * 
      * @return \Anax\Database\DatabaseQueryBuilder  Database service instance with executed internal query.
      */
-    protected function executeQuerySoft($select = null, $conditions = null, $values = [], $order = null)
+    protected function executeQuerySoft($select = null, $conditions = null, $values = [])
     {
         $delCond = $this->deleted . ' IS NULL';
         $conditions = (is_null($conditions) ? $delCond : "($conditions) AND $delCond");
-        return parent::executeQuery($select, $conditions, $values, $order);
+        return $this->executeQuery($select, $conditions, $values);
     }
 }

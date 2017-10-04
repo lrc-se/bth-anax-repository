@@ -1,6 +1,12 @@
 Anax Repository
 ===============
 
+[![Latest Stable Version](https://poser.pugx.org/lrc-se/anax-repository/v/stable)](https://packagist.org/packages/lrc-se/anax-repository)
+[![Travis CI Build Status](https://travis-ci.org/lrc-se/bth-anax-repository.svg?branch=master)](https://travis-ci.org/lrc-se/bth-anax-repository)
+[![Scrutinizer Build Status](https://scrutinizer-ci.com/g/lrc-se/bth-anax-repository/badges/build.png?b=master)](https://scrutinizer-ci.com/g/lrc-se/bth-anax-repository/build-status/master)
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/lrc-se/bth-anax-repository/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/lrc-se/bth-anax-repository/?branch=master)
+[![Scrutinizer Code Coverage](https://scrutinizer-ci.com/g/lrc-se/bth-anax-repository/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/lrc-se/bth-anax-repository/?branch=master)
+
 Repository module for the modular [Anax framework](https://github.com/canax), 
 providing model-based data access through a consistent interface. 
 As of now the included implementation works with relational databases only.
@@ -198,8 +204,6 @@ class providing the same public API, but it has been included as a dependency fo
 About
 -----
 
-**Type:** School project @[BTH](https://www.bth.se/)
-
-**License:** MIT
-
+**Type:** School project @[BTH](https://www.bth.se/)  
+**License:** MIT  
 **Author:** [LRC](mailto:kabc16@student.bth.se)

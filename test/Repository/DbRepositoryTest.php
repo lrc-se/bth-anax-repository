@@ -26,6 +26,16 @@ class DbRepositoryTest extends DbTestCase
     
     
     /**
+     * Test getModelClass method.
+     */
+    public function testGetModelClass()
+    {
+        $books = $this->getRepository();
+        $this->assertEquals(Book::class, $books->getModelClass());
+    }
+    
+    
+    /**
      * Test count method.
      */
     public function testCount()

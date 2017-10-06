@@ -46,6 +46,15 @@ class DbRepository implements RepositoryInterface
     
     
     /**
+     * Return the class of the model handled by the repository.
+     */
+    public function getModelClass()
+    {
+        return $this->modelClass;
+    }
+    
+    
+    /**
      * Find and return first entry by key.
      *
      * @param string $column    Key column name.

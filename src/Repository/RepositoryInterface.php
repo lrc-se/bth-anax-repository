@@ -8,6 +8,12 @@ namespace LRC\Repository;
 interface RepositoryInterface
 {
     /**
+     * Return the class of the model handled by the repository.
+     */
+    public function getModelClass();
+    
+    
+    /**
      * Find and return first entry by key.
      *
      * @param string $column    Key column name.

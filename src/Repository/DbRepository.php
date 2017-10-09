@@ -5,7 +5,7 @@ namespace LRC\Repository;
 /**
  * Base class for database-backed repositories for data access.
  */
-class DbRepository implements RepositoryInterface
+class DbRepository extends ManagedRepository implements RepositoryInterface
 {
     /**
      * @var \Anax\Database\DatabaseQueryBuilder     Database service.
@@ -78,8 +78,12 @@ class DbRepository implements RepositoryInterface
      */
     public function getFirst($conditions = null, $values = [])
     {
-        return $this->executeQuery(null, $conditions, $values)
+        $model = $this->executeQuery(null, $conditions, $values)
             ->fetchClass($this->modelClass);
+        if (isset($this->manager)) {
+            $this->manager->manageModel($model);
+        }
+        return $model;
     }
     
     
@@ -93,8 +97,14 @@ class DbRepository implements RepositoryInterface
      */
     public function getAll($conditions = null, $values = [])
     {
-        return $this->executeQuery(null, $conditions, $values)
+        $models = $this->executeQuery(null, $conditions, $values)
             ->fetchAllClass($this->modelClass);
+        if (isset($this->manager)) {
+            foreach ($models as $model) {
+                $this->manager->manageModel($model);
+            }
+        }
+        return $models;
     }
     
     

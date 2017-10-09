@@ -25,3 +25,5 @@ require_once 'models/Book.php';
 require_once 'models/Book2.php';
 require_once 'models/Review.php';
 require_once 'models/Review2.php';
+require_once 'models/Review3.php';
+require_once 'models/Review4.php';

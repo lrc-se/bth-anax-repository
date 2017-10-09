@@ -46,6 +46,15 @@ class DbRepository extends ManagedRepository implements RepositoryInterface
     
     
     /**
+     * Return the name of the database table represented by the repository.
+     */
+    public function getCollectionName()
+    {
+        return $this->table;
+    }
+    
+    
+    /**
      * Return the class of the model handled by the repository.
      */
     public function getModelClass()

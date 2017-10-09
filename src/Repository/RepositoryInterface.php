@@ -8,6 +8,12 @@ namespace LRC\Repository;
 interface RepositoryInterface
 {
     /**
+     * Return the name of the collection represented by the repository.
+     */
+    public function getCollectionName();
+    
+    
+    /**
      * Return the class of the model handled by the repository.
      */
     public function getModelClass();

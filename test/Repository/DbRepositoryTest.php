@@ -77,6 +77,10 @@ class DbRepositoryTest extends DbTestCase
         $this->assertEquals('Sun Tzu', $book->author);
         $this->assertNull($book->published);
         
+        // automatic primary key
+        $book2 = $books->find(null, 5);
+        $this->assertEquals($book, $book2);
+        
         // non-existing
         $book = $books->find('id', 0);
         $this->assertFalse($book);

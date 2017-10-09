@@ -59,13 +59,17 @@ class SoftDbRepositoryTest extends DbTestCase2
     {
         $books = $this->getRepository();
         
-        // non-deleted
+        // non-deleted (explicit primary key)
         $book = $books->findSoft('bookId', 4);
         $this->assertInstanceOf(Book2::class, $book);
         $this->assertEquals(4, $book->bookId);
         $this->assertEquals('The Klingon Dictionary', $book->title);
         $this->assertEquals('Marc Okrand', $book->author);
         $this->assertEquals(1992, $book->published);
+        
+        // non-deleted (automatic primary key)
+        $book2 = $books->findSoft(null, 4);
+        $this->assertEquals($book, $book2);
         
         // deleted
         $book = $books->findSoft('bookId', 1);

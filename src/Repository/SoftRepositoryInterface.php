@@ -10,10 +10,10 @@ interface SoftRepositoryInterface extends RepositoryInterface
     /**
      * Find and return first entry by key, ignoring soft-deleted entries.
      *
-     * @param string $column    Key column name.
-     * @param mixed  $value     Key value.
+     * @param string|null   $column Key column name (pass null to use registered primary key).
+     * @param mixed         $value  Key value.
      *
-     * @return mixed            Model instance.
+     * @return mixed                Model instance.
      */
     public function findSoft($column, $value);
     

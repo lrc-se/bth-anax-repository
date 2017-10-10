@@ -33,6 +33,17 @@ trait ManagedModelTrait
     
     
     /**
+     * Return registered foreign model references.
+     *
+     * @return array    Array of references.
+     */
+    public function getReferences()
+    {
+        return $this->_references;
+    }
+    
+    
+    /**
      * Register foreign model references.
      *
      * @param array $references     Array of references (name => config).
@@ -41,7 +52,13 @@ trait ManagedModelTrait
      */
     public function setReferences($references)
     {
-        $this->_references = $references;
+        $this->_references = [];
+        foreach ($references as $name => $ref) {
+            if (!array_key_exists('key', $ref)) {
+                $ref['key'] = 'id';
+            }
+            $this->_references[$name] = $ref;
+        }
         return $this;
     }
     
@@ -66,7 +83,7 @@ trait ManagedModelTrait
             if (!$repo) {
                 throw new RepositoryException('Referenced model is not handled by a managed repository');
             }
-            return ($repo->find((isset($ref['key']) ? $ref['key'] : 'id'), $this->{$ref['attribute']}) ?: null);
+            return ($repo->find($ref['key'], $this->{$ref['attribute']}) ?: null);
         }
         return null;
     }

@@ -18,6 +18,14 @@ interface ManagedModelInterface
     
     
     /**
+     * Return registered foreign model references.
+     *
+     * @return array    Array of references.
+     */
+    public function getReferences();
+    
+    
+    /**
      * Register foreign model references.
      *
      * @param array $references     Array of references (name => config).

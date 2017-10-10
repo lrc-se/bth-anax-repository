@@ -8,6 +8,12 @@ namespace LRC\Repository;
 interface SoftRepositoryInterface extends RepositoryInterface
 {
     /**
+     * Return the name of the attribute used to mark soft deletion.
+     */
+    public function getDeletedAttribute();
+    
+    
+    /**
      * Find and return first entry by key, ignoring soft-deleted entries.
      *
      * @param string|null   $column Key column name (pass null to use registered primary key).

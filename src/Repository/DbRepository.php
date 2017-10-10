@@ -87,11 +87,17 @@ class DbRepository extends ManagedRepository implements RepositoryInterface
      */
     public function getFirst($conditions = null, $values = [])
     {
-        $model = $this->executeQuery(null, $conditions, $values)
-            ->fetchClass($this->modelClass);
-        if (isset($this->manager)) {
+        $query = $this->executeQuery(null, $conditions, $values);
+        if (!empty($this->fetchRefs)) {
+            $res = $query->fetch();
+            $model = ($res ? $this->populateModelFromJoin($res) : $res);
+        } else {
+            $model = $query->fetchClass($this->modelClass);
+        }
+        if ($model && isset($this->manager)) {
             $this->manager->manageModel($model);
         }
+        $this->fetchReferences(false);
         return $model;
     }
     
@@ -106,13 +112,21 @@ class DbRepository extends ManagedRepository implements RepositoryInterface
      */
     public function getAll($conditions = null, $values = [])
     {
-        $models = $this->executeQuery(null, $conditions, $values)
-            ->fetchAllClass($this->modelClass);
+        $query = $this->executeQuery(null, $conditions, $values);
+        if (!empty($this->fetchRefs)) {
+            $models = [];
+            foreach ($query->fetchAll() as $model) {
+                $models[] = $this->populateModelFromJoin($model);
+            }
+        } else {
+            $models = $query->fetchAllClass($this->modelClass);
+        }
         if (isset($this->manager)) {
             foreach ($models as $model) {
                 $this->manager->manageModel($model);
             }
         }
+        $this->fetchReferences(false);
         return $models;
     }
     
@@ -177,15 +191,136 @@ class DbRepository extends ManagedRepository implements RepositoryInterface
     protected function executeQuery($select = null, $conditions = null, $values = [])
     {
         $query = $this->db->connect();
-        $query = (!is_null($select) ? $query->select($select) : $query->select());
-        $query = $query->from($this->table);
-        if (!is_null($conditions)) {
-            $query = $query->where($conditions);
+        if (!empty($this->fetchRefs)) {
+            $query = $this->setupJoin($query, $select, $conditions);
+        } else {
+            $query = (!is_null($select) ? $query->select($select) : $query->select());
+            $query = $query->from($this->table);
+            if (!is_null($conditions)) {
+                $query = $query->where($conditions);
+            }
         }
         return $query->execute($values);
     }
     
     
+    
+    /**
+     * Populate model instance including retrieved references from join query result.
+     * 
+     * @param object $result    Query result.
+     * 
+     * @return mixed            Populated model instance.
+     */
+    protected function populateModelFromJoin($result)
+    {
+        // extract main model
+        $model = new $this->modelClass();
+        foreach (array_keys(get_object_vars($model)) as $attr) {
+            $model->$attr = $result->$attr;
+        }
+        
+        // extract referenced models
+        $refs = $model->getReferences();
+        foreach ((is_array($this->fetchRefs) ? $this->fetchRefs : array_keys($refs)) as $idx => $name) {
+            $prefix = "REF{$idx}_{$name}__";
+            
+            // handle null result
+            if (is_null($result->{$prefix . $refs[$name]['key']})) {
+                $refModel = null;
+            } else {
+                $refModel = new $refs[$name]['model']();
+                foreach (array_keys(get_object_vars($refModel)) as $attr) {
+                    $refModel->$attr = $result->{$prefix . $attr};
+                }
+            }
+            
+            $model->$name = $refModel;
+        }
+        
+        return $model;
+    }
+    
+
+    /**
+     * Set up join query for reference retrieval.
+     *
+     * @param \Anax\Database\DatabaseQueryBuilder   $query      Database service instance with initialized query.
+     * @param string                                $select     Selection criteria.
+     * @param string                                $conditions Where conditions.
+     *
+     * @return \Anax\Database\DatabaseQueryBuilder              Database service instance with prepared join query.
+     */
+    private function setupJoin($query, $select, $conditions)
+    {
+        // find references
+        $model = new $this->modelClass();
+        $refs = $model->getReferences();
+        if (is_array($this->fetchRefs)) {
+            $refs = array_intersect_key($refs, array_flip($this->fetchRefs));
+        }
+        
+        // prefix main model selection
+        if (!is_null($select)) {
+            $select = $this->prefixModelAttributes($select, $model);
+        } else {
+            $select = $this->table . '.*';
+        }
+        
+        // set up reference aliases and join conditions
+        $select = [$select];
+        $join = [];
+        $idx = 0;
+        foreach ($refs as $name => $ref) {
+            // prefix attributes
+            $refTable = "REF{$idx}_{$name}";
+            $idx++;
+            foreach (array_keys(get_object_vars(new $ref['model']())) as $attr) {
+                $select[] = "{$refTable}.{$attr} AS '{$refTable}__{$attr}'";
+            }
+            
+            // generate join conditions
+            $joinCond = $this->table . '.' . $ref['attribute'] . " = {$refTable}." . $ref['key'];
+            $refRepo = $this->manager->getByClass($ref['model']);
+            if ($this->softRefs && $refRepo instanceof SoftDbRepository) {
+                $joinCond .= " AND $refTable." . $refRepo->getDeletedAttribute() . ' IS NULL';
+            }
+            $join[] = [$refRepo->getCollectionName() . " AS $refTable", $joinCond];
+        }
+        
+        // generate join query
+        $query = $query->select(implode(', ', $select))->from($this->table);
+        foreach ($join as $args) {
+            $query = $query->leftJoin(...$args);
+        }
+        
+        // prefix where conditions
+        if (!is_null($conditions)) {
+            $conditions = $this->prefixModelAttributes($conditions, $model);
+            $query = $query->where($conditions);
+        }
+        
+        return $query;
+    }
+    
+    
+    /**
+     * Prefix model attributes with the associated table name.
+     * 
+     * @param string $input     Input string.
+     * @param object $model     Model instance.
+     * 
+     * @return string           String with table-prefixed attributes.
+     */
+    private function prefixModelAttributes($input, $model)
+    {
+        foreach (array_keys(get_object_vars($model)) as $attr) {
+            $input = preg_replace('/\\b' . $attr . '\\b/', $this->table . ".$attr", $input);
+        }
+        return $input;
+    }
+    
+        
     /**
      * Create new entry.
      * 

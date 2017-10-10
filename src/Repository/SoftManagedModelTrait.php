@@ -30,7 +30,7 @@ trait SoftManagedModelTrait
             if (!$repo || !($repo instanceof SoftRepositoryInterface)) {
                 throw new RepositoryException('Referenced model is not handled by a managed soft-deletion-aware repository');
             }
-            return ($repo->findSoft((isset($ref['key']) ? $ref['key'] : 'id'), $this->{$ref['attribute']}) ?: null);
+            return ($repo->findSoft($ref['key'], $this->{$ref['attribute']}) ?: null);
         }
         return null;
     }

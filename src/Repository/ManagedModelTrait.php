@@ -39,7 +39,7 @@ trait ManagedModelTrait
      */
     public function getReferences()
     {
-        return $this->_references;
+        return ($this->_references ?: []);
     }
     
     

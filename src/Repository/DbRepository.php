@@ -336,12 +336,11 @@ class DbRepository extends ManagedRepository implements RepositoryInterface
      */
     private function create($model)
     {
-        $props = get_object_vars($model);
-        unset($props[$this->key]);
+        $attrs = $this->getMutableAttributes($model);
         $this->db
             ->connect()
-            ->insert($this->table, array_keys($props))
-            ->execute(array_values($props));
+            ->insert($this->table, array_keys($attrs))
+            ->execute(array_values($attrs));
         $model->{$this->key} = $this->db->lastInsertId();
     }
     
@@ -353,14 +352,36 @@ class DbRepository extends ManagedRepository implements RepositoryInterface
      */
     private function update($model)
     {
-        $props = get_object_vars($model);
-        unset($props[$this->key]);
-        $values = array_values($props);
+        $attrs = $this->getMutableAttributes($model);
+        $values = array_values($attrs);
         $values[] = $model->{$this->key};
         $this->db
             ->connect()
-            ->update($this->table, array_keys($props))
+            ->update($this->table, array_keys($attrs))
             ->where($this->key . ' = ?')
             ->execute($values);
+    }
+    
+    
+    /**
+     * Get mutable model attributes.
+     *
+     * @param object $model Model instance.
+     *
+     * @return array        Array of attributes.
+     */
+    private function getMutableAttributes($model)
+    {
+        $attrs = get_object_vars($model);
+        unset($attrs[$this->key]);
+        
+        // remove reference attributes, if any
+        if ($model instanceof ManagedModelInterface) {
+            foreach (array_keys($model->getReferences()) as $ref) {
+                unset($attrs[$ref]);
+            }
+        }
+        
+        return $attrs;
     }
 }

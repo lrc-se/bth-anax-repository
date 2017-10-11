@@ -27,3 +27,6 @@ require_once 'models/Review.php';
 require_once 'models/Review2.php';
 require_once 'models/Review3.php';
 require_once 'models/Review4.php';
+require_once 'models/User.php';
+require_once 'models/Question.php';
+require_once 'models/Answer.php';

@@ -1,0 +1,10 @@
+CREATE TABLE IF NOT EXISTS answer (
+    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+    questionId INTEGER NOT NULL,
+    userId INTEGER NOT NULL,
+    text VARCHAR NOT NULL,
+    published DATETIME NOT NULL,
+    deleted DATETIME NULL,
+    FOREIGN KEY (questionId) REFERENCES question(id),
+    FOREIGN KEY (userId) REFERENCES user(id)
+);

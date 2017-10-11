@@ -1,0 +1,74 @@
+user:
+    -
+        id: 1
+        username: "admin"
+        name: "Admin"
+        admin: 1
+    -
+        id: 2
+        username: "doe"
+        name: "John Doe"
+    -
+        id: 3
+        username: "doe2"
+        name: "Jane Doe"
+
+question:
+    -
+        id: 1
+        userId: 2
+        title: "The ultimate question"
+        text: "What is the answer to life, the universe and everything?"
+        published: 2017-10-05 19:25:26
+        deleted:
+    -
+        id: 2
+        userId: 2
+        title: "Meta"
+        text: "Is this a question?"
+        published: 2017-10-06 06:18:01
+        deleted:
+    -
+        id: 3
+        userId: 3
+        title: "I'm just stringing you along"
+        text: "How long is a string?"
+        published: 2017-10-10 12:13:47
+        deleted: 2017-10-10 18:06:30
+
+answer:
+    -
+        id: 1
+        questionId: 1
+        userId: 3
+        text: "42"
+        published: 2017-10-05 23:56:08
+        deleted:
+    -
+        id: 2
+        questionId: 1
+        userId: 1
+        text: "I concur!"
+        published: 2017-10-06 01:11:25
+        deleted:
+    -
+        id: 3
+        questionId: 2
+        userId: 3
+        text: "If this is an answer."
+        published: 2017-10-06 12:18:59
+        deleted:
+    -
+        id: 4
+        questionId: 3
+        userId: 1
+        text: "42"
+        published: 2017-10-10 13:22:44
+        deleted:
+    -
+        id: 5
+        questionId: 3
+        userId: 2
+        text: "Wrong question!?"
+        published: 2017-10-10 16:20:37
+        deleted:

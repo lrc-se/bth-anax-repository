@@ -222,7 +222,9 @@ class DbRepository extends ManagedRepository implements RepositoryInterface
         
         // extract referenced models
         $refs = $model->getReferences();
-        foreach ((is_array($this->fetchRefs) ? $this->fetchRefs : array_keys($refs)) as $idx => $name) {
+        $refs2 = (is_array($this->fetchRefs) ? $this->fetchRefs : array_keys($refs));
+        sort($refs2);
+        foreach ($refs2 as $idx => $name) {
             $prefix = "REF{$idx}_{$name}__";
             
             // handle null result
@@ -233,6 +235,11 @@ class DbRepository extends ManagedRepository implements RepositoryInterface
                 foreach (array_keys(get_object_vars($refModel)) as $attr) {
                     $refModel->$attr = $result->{$prefix . $attr};
                 }
+            }
+            
+            // inject manager reference
+            if ($refModel && $this->manager) {
+                $this->manager->manageModel($refModel);
             }
             
             $model->$name = $refModel;
@@ -259,6 +266,7 @@ class DbRepository extends ManagedRepository implements RepositoryInterface
         if (is_array($this->fetchRefs)) {
             $refs = array_intersect_key($refs, array_flip($this->fetchRefs));
         }
+        ksort($refs);
         
         // prefix main model selection
         if (!is_null($select)) {

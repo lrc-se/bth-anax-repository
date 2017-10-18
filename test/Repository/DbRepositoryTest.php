@@ -111,6 +111,14 @@ class DbRepositoryTest extends DbTestCase
         $this->assertEquals('J.R.R. Tolkien', $book->author);
         $this->assertEquals(1955, $book->published);
         
+        // existing (with ordering)
+        $book = $books->getFirst(null, [], 'published DESC');
+        $this->assertInstanceOf(Book::class, $book);
+        $this->assertEquals(4, $book->id);
+        $this->assertEquals('The Klingon Dictionary', $book->title);
+        $this->assertEquals('Marc Okrand', $book->author);
+        $this->assertEquals(1992, $book->published);
+        
         // non-existing
         $book = $books->getFirst('title IS NULL');
         $this->assertFalse($book);
@@ -137,6 +145,16 @@ class DbRepositoryTest extends DbTestCase
         // with condition
         $allBooks = $books->getAll("title LIKE 'The %'");
         $table = $this->getConnection()->createQueryTable('book-test', "SELECT * FROM book WHERE title LIKE 'The %'");
+        $this->assertEquals($table->getRowCount(), count($allBooks));
+        $idx = 0;
+        foreach ($allBooks as $book) {
+            $this->assertInstanceOf(Book::class, $book);
+            $this->assertEquals($table->getRow($idx++), get_object_vars($book));
+        }
+        
+        // with ordering
+        $allBooks = $books->getAll(null, [], 'title');
+        $table = $this->getConnection()->createQueryTable('book-test', 'SELECT * FROM book ORDER BY title');
         $this->assertEquals($table->getRowCount(), count($allBooks));
         $idx = 0;
         foreach ($allBooks as $book) {

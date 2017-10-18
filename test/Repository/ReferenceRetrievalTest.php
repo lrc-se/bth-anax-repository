@@ -62,7 +62,7 @@ class ReferenceRetrievalTest extends DbTestCase3
             $this->assertEquals($question2, $question);
             
             // update
-            $question->published = date('Y-m-d H:i:s');
+            $question->published = '2017-10-18 17:29:13';
             $questions->save($question);
             $question2 = $questions->fetchReferences()->find(null, $question->id);
             $this->assertEquals($question2, $question);
@@ -79,8 +79,23 @@ class ReferenceRetrievalTest extends DbTestCase3
             $this->assertInstanceOf(User::class, $question->user);
             $this->assertEquals($user, $question->user);
             
+            // single result (with ordering)
+            $question = $questions->fetchReferences()->getFirst(null, [], 'published DESC');
+            $this->assertEquals($question2->id, $question->id);
+            $user = $users->find(null, $question->userId);
+            $this->assertInstanceOf(User::class, $question->user);
+            $this->assertEquals($user, $question->user);
+            
             // multiple results
             $allQuestions = $questions->fetchReferences()->getAll();
+            foreach ($allQuestions as $ques) {
+                $this->assertInstanceOf(User::class, $ques->user);
+                $this->assertEquals($users->find(null, $ques->userId), $ques->user);
+            }
+            
+            // multiple results (with ordering)
+            $allQuestions = $questions->fetchReferences()->getAll(null, [], 'published DESC');
+            $this->assertEquals($question2, $allQuestions[0]);
             foreach ($allQuestions as $ques) {
                 $this->assertInstanceOf(User::class, $ques->user);
                 $this->assertEquals($users->find(null, $ques->userId), $ques->user);
@@ -145,6 +160,16 @@ class ReferenceRetrievalTest extends DbTestCase3
                 $exception = $ex;
             }
             $this->assertInstanceOf(RepositoryException::class, $exception);
+            
+            // single results (with ordering)
+            $answer = $answers->fetchReferences()->getFirst(null, [], 'userId, questionId DESC');
+            $this->assertEquals(4, $answer->id);
+            $question = $questions->find(null, $answer->questionId);
+            $user = $users->find(null, $answer->userId);
+            $this->assertInstanceOf(Question::class, $answer->question);
+            $this->assertInstanceOf(User::class, $answer->user);
+            $this->assertEquals($question, $answer->question);
+            $this->assertEquals($user, $answer->user);
         } finally {
             // clean up references to release database lock
             $users->setManager(null);
@@ -202,6 +227,19 @@ class ReferenceRetrievalTest extends DbTestCase3
                     $exception = $ex;
                 }
                 $this->assertInstanceOf(RepositoryException::class, $exception);
+            }
+            
+            // multiple results (with ordering)
+            $allAnswers = $answers->fetchReferences()->getAll(null, [], 'questionId ASC, published DESC');
+            $this->assertEquals(2, $allAnswers[0]->id);
+            foreach ($allAnswers as $answer) {
+                $question = $questions->find(null, $answer->questionId);
+                $user = $users->find(null, $answer->userId);
+                $this->assertInstanceOf(Question::class, $answer->question);
+                $this->assertInstanceOf(User::class, $answer->user);
+                $this->assertEquals($question, $answer->question);
+                $this->assertEquals($user, $answer->user);
+                $answer->question->setManager(null);
             }
         } finally {
             // clean up references to release database lock

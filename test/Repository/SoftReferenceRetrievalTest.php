@@ -87,6 +87,20 @@ class SoftReferenceRetrievalTest extends DbTestCase3
             $this->assertInstanceOf(User::class, $answer->user);
             $this->assertNull($answer->question);
             $this->assertEquals($user, $answer->user);
+            
+            // single result (automatic non-deleted reference, with condition and ordering)
+            $question = $questions->fetchReferences(true, true)->getFirstSoft('id <= 3', [], 'published DESC');
+            $this->assertEquals(2, $question->id);
+            $user = $users->find(null, $question->userId);
+            $this->assertInstanceOf(User::class, $question->user);
+            $this->assertEquals($user, $question->user);
+            
+            // single result (automatic soft-deleted reference, with ordering)
+            $answer = $answers->fetchReferences(true, true)->getFirstSoft(null, [], 'questionId DESC');
+            $user = $users->find(null, $answer->userId);
+            $this->assertInstanceOf(User::class, $answer->user);
+            $this->assertNull($answer->question);
+            $this->assertEquals($user, $answer->user);
         } finally {
             // clean up references to release database lock
             $users->setManager(null);
@@ -193,6 +207,19 @@ class SoftReferenceRetrievalTest extends DbTestCase3
             
             // multiple results (named references)
             $allAnswers = $answers->fetchReferences(['user', 'question'], true)->getAllSoft();
+            foreach ($allAnswers as $answer) {
+                if (!is_null($answer->question)) {
+                    $this->assertInstanceOf(Question::class, $answer->question);
+                }
+                $this->assertInstanceOf(User::class, $answer->user);
+                $question = $questions->findSoft(null, $answer->questionId);
+                $this->assertEquals($question, $answer->question);
+                $this->assertEquals($users->find(null, $answer->userId), $answer->user);
+            }
+            
+            // multiple results (named references, with condition and ordering)
+            $allAnswers = $answers->fetchReferences(['question', 'user'], true)->getAllSoft('userId = ?', [3], 'questionId ASC');
+            $this->assertEquals(3, $allAnswers[1]->id);
             foreach ($allAnswers as $answer) {
                 if (!is_null($answer->question)) {
                     $this->assertInstanceOf(Question::class, $answer->question);

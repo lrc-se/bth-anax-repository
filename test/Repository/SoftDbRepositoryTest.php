@@ -100,6 +100,14 @@ class SoftDbRepositoryTest extends DbTestCase2
         $this->assertEquals('J.R.R. Tolkien', $book->author);
         $this->assertEquals(1954, $book->published);
         
+        // non-deleted (with ordering)
+        $book = $books->getFirstSoft(null, [], 'bookId DESC');
+        $this->assertInstanceOf(Book2::class, $book);
+        $this->assertEquals(4, $book->bookId);
+        $this->assertEquals('The Klingon Dictionary', $book->title);
+        $this->assertEquals('Marc Okrand', $book->author);
+        $this->assertEquals(1992, $book->published);
+        
         // deleted
         $book = $books->getFirstSoft('author = ?', ['Sun Tzu']);
         $this->assertFalse($book);
@@ -126,6 +134,16 @@ class SoftDbRepositoryTest extends DbTestCase2
         // with condition
         $allBooks = $books->getAllSoft("title LIKE 'The %'");
         $table = $this->getConnection()->createQueryTable('book-test', "SELECT * FROM book WHERE title LIKE 'The %' AND deleted IS NULL");
+        $this->assertEquals($table->getRowCount(), count($allBooks));
+        $idx = 0;
+        foreach ($allBooks as $book) {
+            $this->assertInstanceOf(Book2::class, $book);
+            $this->assertEquals($table->getRow($idx++), get_object_vars($book));
+        }
+        
+        // with ordering
+        $allBooks = $books->getAllSoft(null, [], 'title');
+        $table = $this->getConnection()->createQueryTable('book-test', 'SELECT * FROM book WHERE deleted IS NULL ORDER BY title');
         $this->assertEquals($table->getRowCount(), count($allBooks));
         $idx = 0;
         foreach ($allBooks as $book) {

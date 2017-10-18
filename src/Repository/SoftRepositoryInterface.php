@@ -29,10 +29,11 @@ interface SoftRepositoryInterface extends RepositoryInterface
      * 
      * @param string $conditions    Where conditions.
      * @param array  $values        Array of condition values to bind.
+     * @param string $order         Order by clause.
      * 
      * @return mixed                Model instance.
      */
-    public function getFirstSoft($conditions = null, $values = []);
+    public function getFirstSoft($conditions = null, $values = [], $order = null);
     
     
     /**
@@ -40,10 +41,11 @@ interface SoftRepositoryInterface extends RepositoryInterface
      * 
      * @param string $conditions    Where conditions.
      * @param array  $values        Array of condition values to bind.
+     * @param string $order         Order by clause.
      * 
      * @return array                Array of all matching entries.
      */
-    public function getAllSoft($conditions = null, $values = []);
+    public function getAllSoft($conditions = null, $values = [], $order = null);
     
     
     /**

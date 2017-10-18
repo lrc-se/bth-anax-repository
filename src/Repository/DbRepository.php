@@ -4,6 +4,8 @@ namespace LRC\Repository;
 
 /**
  * Base class for database-backed repositories for data access.
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class DbRepository extends ManagedRepository implements RepositoryInterface
 {
@@ -82,12 +84,13 @@ class DbRepository extends ManagedRepository implements RepositoryInterface
      * 
      * @param string $conditions    Where conditions.
      * @param array  $values        Array of condition values to bind.
+     * @param string $order         Order by clause.
      * 
      * @return mixed                Model instance.
      */
-    public function getFirst($conditions = null, $values = [])
+    public function getFirst($conditions = null, $values = [], $order = null)
     {
-        $query = $this->executeQuery(null, $conditions, $values);
+        $query = $this->executeQuery(null, $conditions, $values, $order);
         if (!empty($this->fetchRefs)) {
             $res = $query->fetch();
             $model = ($res ? $this->populateModelFromJoin($res) : $res);
@@ -107,12 +110,13 @@ class DbRepository extends ManagedRepository implements RepositoryInterface
      * 
      * @param string $conditions    Where conditions.
      * @param array  $values        Array of condition values to bind.
+     * @param string $order         Order by clause.
      * 
      * @return array                Array of all matching entries.
      */
-    public function getAll($conditions = null, $values = [])
+    public function getAll($conditions = null, $values = [], $order = null)
     {
-        $query = $this->executeQuery(null, $conditions, $values);
+        $query = $this->executeQuery(null, $conditions, $values, $order);
         if (!empty($this->fetchRefs)) {
             $models = [];
             foreach ($query->fetchAll() as $model) {
@@ -182,22 +186,26 @@ class DbRepository extends ManagedRepository implements RepositoryInterface
     /**
      * Execute query for selection methods.
      * 
-     * @param string $select                        Selection criteria.
-     * @param string $conditions                    Where conditions.
-     * @param array  $values                        Array of where condition values to bind.
+     * @param   string  $select                     Selection criteria.
+     * @param   string  $conditions                 Where conditions.
+     * @param   array   $values                     Array of where condition values to bind.
+     * @param   string  $order                      Order by clause.
      * 
      * @return \Anax\Database\DatabaseQueryBuilder  Database service instance with executed internal query.
      */
-    protected function executeQuery($select = null, $conditions = null, $values = [])
+    protected function executeQuery($select = null, $conditions = null, $values = [], $order = null)
     {
         $query = $this->db->connect();
         if (!empty($this->fetchRefs)) {
-            $query = $this->setupJoin($query, $select, $conditions);
+            $query = $this->setupJoin($query, $select, $conditions, $order);
         } else {
             $query = (!is_null($select) ? $query->select($select) : $query->select());
             $query = $query->from($this->table);
             if (!is_null($conditions)) {
                 $query = $query->where($conditions);
+            }
+            if (!is_null($order)) {
+                $query = $query->orderBy($order);
             }
         }
         return $query->execute($values);
@@ -255,10 +263,14 @@ class DbRepository extends ManagedRepository implements RepositoryInterface
      * @param \Anax\Database\DatabaseQueryBuilder   $query      Database service instance with initialized query.
      * @param string                                $select     Selection criteria.
      * @param string                                $conditions Where conditions.
+     * @param string                                $order      Order by clause.
      *
      * @return \Anax\Database\DatabaseQueryBuilder              Database service instance with prepared join query.
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
-    private function setupJoin($query, $select, $conditions)
+    private function setupJoin($query, $select, $conditions, $order = null)
     {
         // find references
         $model = new $this->modelClass();
@@ -304,8 +316,12 @@ class DbRepository extends ManagedRepository implements RepositoryInterface
         
         // prefix where conditions
         if (!is_null($conditions)) {
-            $conditions = $this->prefixModelAttributes($conditions, $model);
-            $query = $query->where($conditions);
+            $query = $query->where($this->prefixModelAttributes($conditions, $model));
+        }
+        
+        // prefix order by clause
+        if (!is_null($order)) {
+            $query = $query->orderBy($this->prefixModelAttributes($order, $model));
         }
         
         return $query;

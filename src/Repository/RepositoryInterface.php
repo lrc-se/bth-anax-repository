@@ -35,10 +35,11 @@ interface RepositoryInterface
      * 
      * @param string $conditions    Where conditions.
      * @param array  $values        Array of condition values to bind.
+     * @param string $order         Order by clause.
      * 
      * @return mixed                Model instance.
      */
-    public function getFirst($conditions = null, $values = []);
+    public function getFirst($conditions = null, $values = [], $order = null);
     
     
     /**
@@ -46,10 +47,11 @@ interface RepositoryInterface
      * 
      * @param string $conditions    Where conditions.
      * @param array  $values        Array of condition values to bind.
+     * @param string $order         Order by clause.
      * 
      * @return array                Array of all matching entries.
      */
-    public function getAll($conditions = null, $values = []);
+    public function getAll($conditions = null, $values = [], $order = null);
     
     
     /**

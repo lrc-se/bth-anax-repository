@@ -150,6 +150,16 @@ class SoftDbRepositoryTest extends DbTestCase2
             $this->assertInstanceOf(Book2::class, $book);
             $this->assertEquals($table->getRow($idx++), get_object_vars($book));
         }
+        
+        // with ordering and limit/offset
+        $allBooks = $books->getAllSoft(null, [], ['order' => 'title DESC', 'limit' => 2, 'offset' => 2]);
+        $table = $this->getConnection()->createQueryTable('book-test', 'SELECT * FROM book WHERE deleted IS NULL ORDER BY title DESC LIMIT 2 OFFSET 2');
+        $this->assertEquals($table->getRowCount(), count($allBooks));
+        $idx = 0;
+        foreach ($allBooks as $book) {
+            $this->assertInstanceOf(Book2::class, $book);
+            $this->assertEquals($table->getRow($idx++), get_object_vars($book));
+        }
     }
     
     

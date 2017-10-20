@@ -208,6 +208,14 @@ class DbRepository extends ManagedRepository implements RepositoryInterface
                 $query = $query->orderBy($options['order']);
             }
         }
+        
+        if (isset($options['limit'])) {
+            $query = $query->limit($options['limit']);
+        }
+        if (isset($options['offset'])) {
+            $query = $query->offset($options['offset']);
+        }
+        
         return $query->execute($values);
     }
     

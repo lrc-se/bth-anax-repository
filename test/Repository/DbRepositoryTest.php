@@ -161,6 +161,16 @@ class DbRepositoryTest extends DbTestCase
             $this->assertInstanceOf(Book::class, $book);
             $this->assertEquals($table->getRow($idx++), get_object_vars($book));
         }
+        
+        // with limit/offset
+        $allBooks = $books->getAll(null, [], ['limit' => 2, 'offset' => 1]);
+        $table = $this->getConnection()->createQueryTable('book-test', 'SELECT * FROM book LIMIT 2 OFFSET 1');
+        $this->assertEquals($table->getRowCount(), count($allBooks));
+        $idx = 0;
+        foreach ($allBooks as $book) {
+            $this->assertInstanceOf(Book::class, $book);
+            $this->assertEquals($table->getRow($idx++), get_object_vars($book));
+        }
     }
     
     

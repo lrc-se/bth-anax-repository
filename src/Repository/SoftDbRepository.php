@@ -57,13 +57,13 @@ class SoftDbRepository extends DbRepository implements SoftRepositoryInterface
      * 
      * @param string $conditions    Where conditions.
      * @param array  $values        Array of condition values to bind.
-     * @param string $order         Order by clause.
+     * @param array  $options       Query options.
      * 
      * @return mixed                Model instance.
      */
-    public function getFirstSoft($conditions = null, $values = [], $order = null)
+    public function getFirstSoft($conditions = null, $values = [], $options = [])
     {
-        $query = $this->executeQuerySoft(null, $conditions, $values, $order);
+        $query = $this->executeQuerySoft(null, $conditions, $values, $options);
         if (!empty($this->fetchRefs)) {
             $res = $query->fetch();
             $model = ($res ? $this->populateModelFromJoin($res) : $res);
@@ -83,13 +83,13 @@ class SoftDbRepository extends DbRepository implements SoftRepositoryInterface
      * 
      * @param string $conditions    Where conditions.
      * @param array  $values        Array of condition values to bind.
-     * @param string $order         Order by clause.
+     * @param array  $options       Query options.
      * 
      * @return array                Array of all matching entries.
      */
-    public function getAllSoft($conditions = null, $values = [], $order = null)
+    public function getAllSoft($conditions = null, $values = [], $options = [])
     {
-        $query = $this->executeQuerySoft(null, $conditions, $values, $order);
+        $query = $this->executeQuerySoft(null, $conditions, $values, $options);
         if (!empty($this->fetchRefs)) {
             $models = [];
             foreach ($query->fetchAll() as $model) {
@@ -154,14 +154,14 @@ class SoftDbRepository extends DbRepository implements SoftRepositoryInterface
      * @param   string  $select                     Selection criteria.
      * @param   string  $conditions                 Where conditions.
      * @param   array   $values                     Array of where condition values to bind.
-     * @param   string  $order                      Order by clause.
+     * @param   array   $options                    Query options.
      * 
      * @return \Anax\Database\DatabaseQueryBuilder  Database service instance with executed internal query.
      */
-    protected function executeQuerySoft($select = null, $conditions = null, $values = [], $order = null)
+    protected function executeQuerySoft($select = null, $conditions = null, $values = [], $options = [])
     {
         $delCond = $this->deleted . ' IS NULL';
         $conditions = (is_null($conditions) ? $delCond : "($conditions) AND $delCond");
-        return $this->executeQuery($select, $conditions, $values, $order);
+        return $this->executeQuery($select, $conditions, $values, $options);
     }
 }

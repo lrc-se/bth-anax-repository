@@ -112,7 +112,7 @@ class DbRepositoryTest extends DbTestCase
         $this->assertEquals(1955, $book->published);
         
         // existing (with ordering)
-        $book = $books->getFirst(null, [], 'published DESC');
+        $book = $books->getFirst(null, [], ['order' => 'published DESC']);
         $this->assertInstanceOf(Book::class, $book);
         $this->assertEquals(4, $book->id);
         $this->assertEquals('The Klingon Dictionary', $book->title);
@@ -153,7 +153,7 @@ class DbRepositoryTest extends DbTestCase
         }
         
         // with ordering
-        $allBooks = $books->getAll(null, [], 'title');
+        $allBooks = $books->getAll(null, [], ['order' => 'title']);
         $table = $this->getConnection()->createQueryTable('book-test', 'SELECT * FROM book ORDER BY title');
         $this->assertEquals($table->getRowCount(), count($allBooks));
         $idx = 0;

@@ -84,13 +84,13 @@ class DbRepository extends ManagedRepository implements RepositoryInterface
      * 
      * @param string $conditions    Where conditions.
      * @param array  $values        Array of condition values to bind.
-     * @param string $order         Order by clause.
+     * @param array  $options       Query options.
      * 
      * @return mixed                Model instance.
      */
-    public function getFirst($conditions = null, $values = [], $order = null)
+    public function getFirst($conditions = null, $values = [], $options = [])
     {
-        $query = $this->executeQuery(null, $conditions, $values, $order);
+        $query = $this->executeQuery(null, $conditions, $values, $options);
         if (!empty($this->fetchRefs)) {
             $res = $query->fetch();
             $model = ($res ? $this->populateModelFromJoin($res) : $res);
@@ -110,13 +110,13 @@ class DbRepository extends ManagedRepository implements RepositoryInterface
      * 
      * @param string $conditions    Where conditions.
      * @param array  $values        Array of condition values to bind.
-     * @param string $order         Order by clause.
+     * @param array  $options       Query options.
      * 
      * @return array                Array of all matching entries.
      */
-    public function getAll($conditions = null, $values = [], $order = null)
+    public function getAll($conditions = null, $values = [], $options = [])
     {
-        $query = $this->executeQuery(null, $conditions, $values, $order);
+        $query = $this->executeQuery(null, $conditions, $values, $options);
         if (!empty($this->fetchRefs)) {
             $models = [];
             foreach ($query->fetchAll() as $model) {
@@ -189,23 +189,23 @@ class DbRepository extends ManagedRepository implements RepositoryInterface
      * @param   string  $select                     Selection criteria.
      * @param   string  $conditions                 Where conditions.
      * @param   array   $values                     Array of where condition values to bind.
-     * @param   string  $order                      Order by clause.
+     * @param   array   $options                    Query options.
      * 
      * @return \Anax\Database\DatabaseQueryBuilder  Database service instance with executed internal query.
      */
-    protected function executeQuery($select = null, $conditions = null, $values = [], $order = null)
+    protected function executeQuery($select = null, $conditions = null, $values = [], $options = [])
     {
         $query = $this->db->connect();
         if (!empty($this->fetchRefs)) {
-            $query = $this->setupJoin($query, $select, $conditions, $order);
+            $query = $this->setupJoin($query, $select, $conditions, (isset($options['order']) ? $options['order'] : null));
         } else {
             $query = (!is_null($select) ? $query->select($select) : $query->select());
             $query = $query->from($this->table);
             if (!is_null($conditions)) {
                 $query = $query->where($conditions);
             }
-            if (!is_null($order)) {
-                $query = $query->orderBy($order);
+            if (isset($options['order'])) {
+                $query = $query->orderBy($options['order']);
             }
         }
         return $query->execute($values);

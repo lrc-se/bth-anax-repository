@@ -80,7 +80,7 @@ class ReferenceRetrievalTest extends DbTestCase3
             $this->assertEquals($user, $question->user);
             
             // single result (with ordering)
-            $question = $questions->fetchReferences()->getFirst(null, [], 'published DESC');
+            $question = $questions->fetchReferences()->getFirst(null, [], ['order' => 'published DESC']);
             $this->assertEquals($question2->id, $question->id);
             $user = $users->find(null, $question->userId);
             $this->assertInstanceOf(User::class, $question->user);
@@ -94,7 +94,7 @@ class ReferenceRetrievalTest extends DbTestCase3
             }
             
             // multiple results (with ordering)
-            $allQuestions = $questions->fetchReferences()->getAll(null, [], 'published DESC');
+            $allQuestions = $questions->fetchReferences()->getAll(null, [], ['order' => 'published DESC']);
             $this->assertEquals($question2, $allQuestions[0]);
             foreach ($allQuestions as $ques) {
                 $this->assertInstanceOf(User::class, $ques->user);
@@ -162,7 +162,7 @@ class ReferenceRetrievalTest extends DbTestCase3
             $this->assertInstanceOf(RepositoryException::class, $exception);
             
             // single results (with ordering)
-            $answer = $answers->fetchReferences()->getFirst(null, [], 'userId, questionId DESC');
+            $answer = $answers->fetchReferences()->getFirst(null, [], ['order' => 'userId, questionId DESC']);
             $this->assertEquals(4, $answer->id);
             $question = $questions->find(null, $answer->questionId);
             $user = $users->find(null, $answer->userId);
@@ -230,7 +230,7 @@ class ReferenceRetrievalTest extends DbTestCase3
             }
             
             // multiple results (with ordering)
-            $allAnswers = $answers->fetchReferences()->getAll(null, [], 'questionId ASC, published DESC');
+            $allAnswers = $answers->fetchReferences()->getAll(null, [], ['order' => 'questionId ASC, published DESC']);
             $this->assertEquals(2, $allAnswers[0]->id);
             foreach ($allAnswers as $answer) {
                 $question = $questions->find(null, $answer->questionId);

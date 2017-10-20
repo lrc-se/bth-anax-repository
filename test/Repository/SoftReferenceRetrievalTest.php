@@ -89,14 +89,14 @@ class SoftReferenceRetrievalTest extends DbTestCase3
             $this->assertEquals($user, $answer->user);
             
             // single result (automatic non-deleted reference, with condition and ordering)
-            $question = $questions->fetchReferences(true, true)->getFirstSoft('id <= 3', [], 'published DESC');
+            $question = $questions->fetchReferences(true, true)->getFirstSoft('id <= 3', [], ['order' => 'published DESC']);
             $this->assertEquals(2, $question->id);
             $user = $users->find(null, $question->userId);
             $this->assertInstanceOf(User::class, $question->user);
             $this->assertEquals($user, $question->user);
             
             // single result (automatic soft-deleted reference, with ordering)
-            $answer = $answers->fetchReferences(true, true)->getFirstSoft(null, [], 'questionId DESC');
+            $answer = $answers->fetchReferences(true, true)->getFirstSoft(null, [], ['order' => 'questionId DESC']);
             $user = $users->find(null, $answer->userId);
             $this->assertInstanceOf(User::class, $answer->user);
             $this->assertNull($answer->question);
@@ -218,7 +218,7 @@ class SoftReferenceRetrievalTest extends DbTestCase3
             }
             
             // multiple results (named references, with condition and ordering)
-            $allAnswers = $answers->fetchReferences(['question', 'user'], true)->getAllSoft('userId = ?', [3], 'questionId ASC');
+            $allAnswers = $answers->fetchReferences(['question', 'user'], true)->getAllSoft('userId = ?', [3], ['order' => 'questionId ASC']);
             $this->assertEquals(3, $allAnswers[1]->id);
             foreach ($allAnswers as $answer) {
                 if (!is_null($answer->question)) {

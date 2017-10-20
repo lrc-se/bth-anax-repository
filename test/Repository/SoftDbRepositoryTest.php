@@ -101,7 +101,7 @@ class SoftDbRepositoryTest extends DbTestCase2
         $this->assertEquals(1954, $book->published);
         
         // non-deleted (with ordering)
-        $book = $books->getFirstSoft(null, [], 'bookId DESC');
+        $book = $books->getFirstSoft(null, [], ['order' => 'bookId DESC']);
         $this->assertInstanceOf(Book2::class, $book);
         $this->assertEquals(4, $book->bookId);
         $this->assertEquals('The Klingon Dictionary', $book->title);
@@ -142,7 +142,7 @@ class SoftDbRepositoryTest extends DbTestCase2
         }
         
         // with ordering
-        $allBooks = $books->getAllSoft(null, [], 'title');
+        $allBooks = $books->getAllSoft(null, [], ['order' => 'title']);
         $table = $this->getConnection()->createQueryTable('book-test', 'SELECT * FROM book WHERE deleted IS NULL ORDER BY title');
         $this->assertEquals($table->getRowCount(), count($allBooks));
         $idx = 0;

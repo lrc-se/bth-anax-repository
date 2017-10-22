@@ -24,7 +24,7 @@ Requirements
 ------------
 
 - PHP 5.6+
-- anax/database 1.1.0+
+- anax/database 1.1.0+ (1.1.6+ for included tests)
 
 
 Usage
@@ -193,9 +193,9 @@ $book = $review->getReferenceSoft($books, 'bookId');
 Notes
 -----
 
-The module [*anax/common*](https://github.com/canax/common) is **not** a dependency of this module per se, 
+The module [*anax/configure*](https://github.com/canax/configure) is **not** a dependency of this module per se, 
 but it **is** required by `DatabaseQueryBuilder` and is therefore included in the `require-dev` section of *composer.json* 
-in order for the unit tests to work.
+in order for the unit tests to work. Also note that before v1.1.6 of *anax/database* this requirement was for [*anax/common*](https://github.com/canax/common) instead.
 
 Additionally, *anax/database* is not actually required as such, only a corresponding implementation of its `DatabaseQueryBuilder` 
 class providing the same public API, but it has been included as a dependency for simplicity's sake.

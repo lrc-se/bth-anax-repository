@@ -23,9 +23,9 @@
     },
     "require": {
         "php": ">=5.6",
-        "anax/database": "^1.1.0"
+        "anax/database": "^1.1.6"
     },
     "require-dev": {
-        "anax/common": "^1.0.8"
+        "anax/configure": "^1.0.2"
     }
 }

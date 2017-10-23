@@ -90,18 +90,7 @@ class DbRepository extends ManagedRepository implements RepositoryInterface
      */
     public function getFirst($conditions = null, $values = [], $options = [])
     {
-        $query = $this->executeQuery(null, $conditions, $values, $options);
-        if (!empty($this->fetchRefs)) {
-            $res = $query->fetch();
-            $model = ($res ? $this->populateModelFromJoin($res) : $res);
-        } else {
-            $model = $query->fetchClass($this->modelClass);
-        }
-        if ($model && isset($this->manager)) {
-            $this->manager->manageModel($model);
-        }
-        $this->fetchReferences(false);
-        return $model;
+        return $this->processSingleResult($this->executeQuery(null, $conditions, $values, $options));
     }
     
     
@@ -116,22 +105,7 @@ class DbRepository extends ManagedRepository implements RepositoryInterface
      */
     public function getAll($conditions = null, $values = [], $options = [])
     {
-        $query = $this->executeQuery(null, $conditions, $values, $options);
-        if (!empty($this->fetchRefs)) {
-            $models = [];
-            foreach ($query->fetchAll() as $model) {
-                $models[] = $this->populateModelFromJoin($model);
-            }
-        } else {
-            $models = $query->fetchAllClass($this->modelClass);
-        }
-        if (isset($this->manager)) {
-            foreach ($models as $model) {
-                $this->manager->manageModel($model);
-            }
-        }
-        $this->fetchReferences(false);
-        return $models;
+        return $this->processMultipleResults($this->executeQuery(null, $conditions, $values, $options));
     }
     
     
@@ -264,7 +238,57 @@ class DbRepository extends ManagedRepository implements RepositoryInterface
         return $model;
     }
     
-
+    
+    /**
+     * Process single query result and return model instance.
+     *
+     * @param \Anax\Database\DatabaseQueryBuilder   $query  Database service instance with executed internal query.
+     *
+     * @return mixed                                        Model instance.
+     */
+    protected function processSingleResult($query)
+    {
+        if (!empty($this->fetchRefs)) {
+            $res = $query->fetch();
+            $model = ($res ? $this->populateModelFromJoin($res) : $res);
+        } else {
+            $model = $query->fetchClass($this->modelClass);
+        }
+        if ($model && isset($this->manager)) {
+            $this->manager->manageModel($model);
+        }
+        $this->fetchReferences(false);
+        return $model;
+    }
+    
+    
+    /**
+     * Process multiple query results and return model instances.
+     *
+     * @param \Anax\Database\DatabaseQueryBuilder   $query  Database service instance with executed internal query.
+     *
+     * @return array                                        Array of model instances.
+     */
+    protected function processMultipleResults($query)
+    {
+        if (!empty($this->fetchRefs)) {
+            $models = [];
+            foreach ($query->fetchAll() as $model) {
+                $models[] = $this->populateModelFromJoin($model);
+            }
+        } else {
+            $models = $query->fetchAllClass($this->modelClass);
+        }
+        if (isset($this->manager)) {
+            foreach ($models as $model) {
+                $this->manager->manageModel($model);
+            }
+        }
+        $this->fetchReferences(false);
+        return $models;
+    }
+    
+    
     /**
      * Set up join query for reference retrieval.
      *

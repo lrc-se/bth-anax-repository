@@ -63,18 +63,7 @@ class SoftDbRepository extends DbRepository implements SoftRepositoryInterface
      */
     public function getFirstSoft($conditions = null, $values = [], $options = [])
     {
-        $query = $this->executeQuerySoft(null, $conditions, $values, $options);
-        if (!empty($this->fetchRefs)) {
-            $res = $query->fetch();
-            $model = ($res ? $this->populateModelFromJoin($res) : $res);
-        } else {
-            $model = $query->fetchClass($this->modelClass);
-        }
-        if ($model && isset($this->manager)) {
-            $this->manager->manageModel($model);
-        }
-        $this->fetchReferences(false);
-        return $model;
+        return $this->processSingleResult($this->executeQuerySoft(null, $conditions, $values, $options));
     }
     
     
@@ -89,22 +78,7 @@ class SoftDbRepository extends DbRepository implements SoftRepositoryInterface
      */
     public function getAllSoft($conditions = null, $values = [], $options = [])
     {
-        $query = $this->executeQuerySoft(null, $conditions, $values, $options);
-        if (!empty($this->fetchRefs)) {
-            $models = [];
-            foreach ($query->fetchAll() as $model) {
-                $models[] = $this->populateModelFromJoin($model);
-            }
-        } else {
-            $models = $query->fetchAllClass($this->modelClass);
-        }
-        if (isset($this->manager)) {
-            foreach ($models as $model) {
-                $this->manager->manageModel($model);
-            }
-        }
-        $this->fetchReferences(false);
-        return $models;
+        return $this->processMultipleResults($this->executeQuerySoft(null, $conditions, $values, $options));
     }
     
     

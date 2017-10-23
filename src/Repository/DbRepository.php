@@ -319,7 +319,7 @@ class DbRepository extends ManagedRepository implements RepositoryInterface
         // generate join query
         $query = $query->select(implode(', ', $select))->from($this->table);
         foreach ($join as $args) {
-            $query = $query->leftJoin(...$args);
+            $query = $query->leftJoin($args[0], $args[1]);
         }
         
         // prefix where conditions

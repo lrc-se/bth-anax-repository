@@ -1,6 +1,14 @@
 Revision history
 ================
 
+1.1.0 (2017-10-23)
+-----------------
+
+* Added repository manager
+* Added support for fully automatic reference retrieval
+* Added support for query options (ORDER BY, LIMIT, OFFSET)
+
+
 1.0.3 (2017-10-04)
 -----------------
 
